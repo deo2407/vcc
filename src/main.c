@@ -3,8 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
-void cmd_init(const char *argv[]) {
-    init_repo();
+int cmd_init(const char *argv[]) {
+    return init_repo();
 }
 
 int main(int argc, const char *argv[]) {

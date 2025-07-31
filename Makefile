@@ -23,7 +23,7 @@ $(BIN_DIR) $(BUILD_DIR):
 .PHONY: all clean run
 
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf $(BUILD_DIR) $(BIN_DIR) .vcc
 
 run: $(TARGET)
 	./$(TARGET) init
