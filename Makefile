@@ -8,11 +8,12 @@ OBJS := $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 CC := gcc
 CFLAGS := -Wall -Wextra
+LDLIBS := -lcrypto
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS) | $(BIN_DIR)
-	$(CC) $(CFLAGS) $(OBJS) -o $@
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDLIBS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -27,4 +28,5 @@ clean:
 
 run: $(TARGET)
 	./$(TARGET) init
+	./$(TARGET) add ./src/main.c
 
