@@ -1,4 +1,4 @@
-blob 585
+blob 586
 #include "init.h"
 #include "add.h"
 
@@ -30,3 +30,4 @@ int main(int argc, const char *argv[]) {
 
     return 0;
 }
+
