@@ -1,4 +1,4 @@
-blob 172
+blob 173
 #ifndef ADD_H
 #define ADD_H
 
@@ -6,8 +6,8 @@ blob 172
 #include <sys/types.h>
 
 void add_tree(char *contents, long size);
-int add(const char *files[], size_t files_len);
+void add(const char *files[], size_t files_len);
 
 #endif
 
-EK_
+fp

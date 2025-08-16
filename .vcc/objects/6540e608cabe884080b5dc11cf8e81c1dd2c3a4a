@@ -14,4 +14,4 @@ void generate_hash_filename(char *contents, long contents_size, char *buf, size_
 void get_hash(char *contents, long contents_size, char *buf, size_t buf_size);
 
 #endif
-RÿÿA
+²ÿÿá

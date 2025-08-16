@@ -6,60 +6,91 @@
 
 #define INDEX_FILE ".vcc/index"
 #define TEMP_FILE  ".vcc/index_tmp"
+#define HASH_MAX   128   // plenty for SHA-1/256 hex + newline/NUL
 
-// Remove lines containing a specific substring from the index file
-int remove_file_from_index(const char *filename) {
+// Copies the hash into hash_out (NUL-terminated).
+// Returns 0 on success (line removed), -1 if not found or on error.
+int remove_file_from_index(const char *filename, char *hash_out, size_t hash_out_sz) {
     FILE *index_fp = fopen(INDEX_FILE, "r");
-    if (!index_fp) {
-        perror("Could not open index file for reading");
-        return -1;
-    }
+    if (!index_fp) { perror("open index for reading"); return -1; }
 
     FILE *temp_fp = fopen(TEMP_FILE, "w");
-    if (!temp_fp) {
-        perror("Could not open temporary file for writing");
-        fclose(index_fp);
-        return -1;
-    }
+    if (!temp_fp) { perror("open temp for writing"); fclose(index_fp); return -1; }
 
     char *line = NULL;
     size_t len = 0;
-    ssize_t read;
+    ssize_t nread;
     int found = 0;
 
-    while ((read = getline(&line, &len, index_fp)) != -1) {
-        // Skip lines containing the filename
-        if (strstr(line, filename) != NULL) {
-            found = 1;
+    while ((nread = getline(&line, &len, index_fp)) != -1) {
+        // Expect lines like: "<filename> <hash>\n"
+        char *sp = strchr(line, ' ');
+        if (!sp) {         
+            fputs(line, temp_fp);
             continue;
         }
+
+        if (!found && strstr(line, filename) == 0) {
+
+            // Extract hash (after the space), strip trailing newline
+            char *hash_start = sp + 1;
+            char *nl = strchr(hash_start, '\n');
+            if (nl) *nl = '\0';
+
+            // Copy out safely
+            if (hash_out && hash_out_sz > 0) {
+                // Truncate if necessary, but keep NUL
+                snprintf(hash_out, hash_out_sz, "%s", hash_start);
+            }
+
+            found = 1;
+            // Skip writing this line (this removes it)
+            continue;
+        }
+
+        // Keep non-matching lines
         fputs(line, temp_fp);
     }
 
     free(line);
     fclose(index_fp);
-    fclose(temp_fp);
+    if (fclose(temp_fp) != 0) { perror("close temp"); /* continue */ }
 
-    // Replace original index with temp file
-    if (remove(INDEX_FILE) != 0) {
-        perror("Failed to remove original index file");
-        return -1;
-    }
-    if (rename(TEMP_FILE, INDEX_FILE) != 0) {
-        perror("Failed to rename temp file to index file");
+    if (!found) {
+        // Nothing removed: discard temp and keep original
+        remove(TEMP_FILE);
         return -1;
     }
 
-    printf("removed file %s from index\n", filename);
-    return found ? 0 : -1;
+    // Replace original index with temp
+    if (remove(INDEX_FILE) != 0) { perror("remove original index"); return -1; }
+    if (rename(TEMP_FILE, INDEX_FILE) != 0) { perror("rename temp->index"); return -1; }
+
+    return 0;
 }
 
-// Remove multiple files from the index
-void remove_files_from_index(const char *files[], int size) {
+int remove_obj_from_storage(const char *hash) {
+    char path[512];
+    snprintf(path, sizeof path, ".vcc/objects/%s", hash);
+    if (remove(path) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+void remove_files_from_storage(const char *files[], int size) {
     for (int i = 0; i < size; i++) {
-        if (remove_file_from_index(files[i]) != 0) {
+        char hash[HASH_MAX] = {0};   // stack buffer owned by caller
+
+        if (remove_file_from_index(files[i], hash, sizeof hash) != 0) {
             fprintf(stderr, "File not found in index: %s\n", files[i]);
+            continue;
         }
+        if (remove_obj_from_storage(hash) != 0) {
+            fprintf(stderr, "Object not found in storage for %s (hash=%s)\n", files[i], hash);
+            continue;
+        }
+        printf("Removed %s (hash=%s) from storage and index\n", files[i], hash);
     }
 }
 

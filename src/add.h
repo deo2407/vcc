@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 void add_tree(char *contents, long size);
-int add(const char *files[], size_t files_len);
+void add(const char *files[], size_t files_len);
 
 #endif
 

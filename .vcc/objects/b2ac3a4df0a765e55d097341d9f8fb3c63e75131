@@ -1,4 +1,4 @@
-blob 3154
+blob 3109
 #include "add.h"
 #include "object.h"
 
@@ -76,7 +76,7 @@ void add_file(const char *filename) {
     fprintf(fp, "%s", serialized);
 
     char hash[SHA_DIGEST_LENGTH * 2 + 1];
-    generate_hash_filename(buffer, bytesRead, hash, sizeof hash);
+    get_hash(buffer, bytesRead, hash, sizeof hash);
     add_to_index(filename, hash);
 
     free(serialized);
@@ -118,15 +118,13 @@ void add_all() {
     rec_search("."); 
 }
 
-int add(const char *files[], size_t files_len) {
-    if (strcmp(files[2], ".") == 0) {
+void add(const char *files[], size_t files_len) {
+    if (strcmp(files[0], ".") == 0) {
         add_all();
-        return 0;
     }
 
-    for (int i = 2; i < files_len; i++) {
+    for (int i = 0; i < files_len; i++) {
         add_file(files[i]); 
     }
-    return 0;
 }
 
