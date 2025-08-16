@@ -32,6 +32,13 @@ int init_repo() {
             return 1;
         }
         fclose(fp);
+
+        fp = fopen(".vcc/index", "w");
+        if (fp == NULL) {
+            fprintf(stderr, "Unable to create file index\n");
+            return 1;
+        }
+        fclose(fp);
     } else {
         printf(".vcc directory already exists\n");
     }

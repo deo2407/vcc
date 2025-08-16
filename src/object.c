@@ -5,10 +5,11 @@
 #include <stdio.h>
 
 // "blob CONTENT_SIZE\n" + content
-char *serialize_file(unsigned char *content, size_t content_size) {
-    const char *type = "blob";
+char *serialize_obj(char *content, size_t content_size, obj_type_t type) {
+    const char *type_str = (type == BLOB) ? "blob" : "tree";
+
     char header[64];
-    int header_size = snprintf(header, sizeof header, "%s %zu\n", type, content_size);
+    int header_size = snprintf(header, sizeof header, "%s %zu\n", type_str, content_size);
     
     size_t out_size = header_size + content_size;
     char *serialized = (char *)malloc(out_size);

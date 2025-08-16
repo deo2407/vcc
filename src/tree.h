@@ -1,0 +1,20 @@
+#ifndef TREE_H
+#define TREE_H
+
+#include "object.h"
+
+typedef enum {
+    MODE_BLOB_REG,
+    MODE_BLOB_EXEC,
+    MODE_TREE,
+    MODE_SYMLINK
+} obj_mode_t;
+
+typedef struct {
+    obj_mode_t mode;
+    obj_type_t type;
+    const char *hash;
+    const char *name;
+} tree_entry;
+
+#endif

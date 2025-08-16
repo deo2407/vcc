@@ -1,3 +1,4 @@
+blob 192
 #ifndef OBJECT_H
 #define OBJECT_H
 
@@ -11,3 +12,6 @@ typedef enum {
 char *serialize_obj(char *contents, size_t content_size, obj_type_t type);
 
 #endif
+
+#endif
+
