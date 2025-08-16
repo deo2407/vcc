@@ -1,4 +1,4 @@
-blob 3309
+blob 3154
 #include "add.h"
 #include "object.h"
 
@@ -8,14 +8,6 @@ blob 3309
 #include <dirent.h>
 #include <openssl/sha.h>
 
-void binary_to_hex(const unsigned char *buf, int len, char *out) {
-    const char hex[] = "0123456789abcdef";
-    for (int i = 0; i < len; i++) {
-        out[i * 2] = hex[(buf[i] >> 4) & 0xF];
-        out[i * 2 + 1] = hex[buf[i] & 0xF];
-    } 
-    out[len * 2] = '\0';
-}
 
 void add_to_index(const char *filename, const char *hash) {
     FILE *fp = fopen(".vcc/index", "ab");
@@ -28,32 +20,20 @@ void add_to_index(const char *filename, const char *hash) {
     fclose(fp);
 }
 
-void add_obj(const char *filename, char *contents, long size, obj_type_t type) {
-    // create the hash for the given object
-    unsigned char hash_bin[SHA_DIGEST_LENGTH];
-    char hash[SHA_DIGEST_LENGTH * 2];
-    SHA1((unsigned char *)contents, size, hash_bin);
-    binary_to_hex(hash_bin, SHA_DIGEST_LENGTH, hash);
-
-    if (type == BLOB)
-        printf("generated hash for file %s: %s\n", filename, hash);
-
-    // serialize it
-    char *serialized = serialize_obj(contents, size, type);
+void add_tree(char *contents, long size) {
+    // serialize tree
+    char *serialized = serialize_obj(contents, size, TREE);
 
     // store the file
     char hash_filename[128];
-    snprintf(hash_filename, sizeof hash_filename, ".vcc/objects/%s", hash);
+    generate_hash_filename(contents, size, hash_filename, sizeof hash_filename);
 
     FILE *fp = fopen(hash_filename, "wb");
     if (fp == NULL) {
-        fprintf(stderr, "could not create object file with hash %s\n", hash);
+        fprintf(stderr, "could not create object file %s\n", hash_filename);
         return;
     }
     fprintf(fp, "%s", serialized);
-
-    if (type == BLOB)
-        add_to_index(filename, hash);
 
     free(serialized);
     fclose(fp);
@@ -80,10 +60,30 @@ void add_file(const char *filename) {
     size_t bytesRead = fread(buffer, 1, length, fp);
     buffer[bytesRead] = '\0';
 
-    add_obj(filename, buffer, bytesRead, BLOB);
+    // serialize it
+    char *serialized = serialize_obj(buffer, bytesRead, BLOB);
+
+    // store the file
+    char hash_filename[128];
+    generate_hash_filename(buffer, bytesRead, hash_filename, sizeof hash_filename);
+    
+    fp = fopen(hash_filename, "wb");
+    if (fp == NULL) {
+        fprintf(stderr, "could not create object file %s\n", hash_filename);
+        return;
+    }
+
+    fprintf(fp, "%s", serialized);
+
+    char hash[SHA_DIGEST_LENGTH * 2 + 1];
+    generate_hash_filename(buffer, bytesRead, hash, sizeof hash);
+    add_to_index(filename, hash);
+
+    free(serialized);
+    fclose(fp);
+
     printf("%s added to storage\n", filename);
 
-    fclose(fp);
     free(buffer);
 }
 

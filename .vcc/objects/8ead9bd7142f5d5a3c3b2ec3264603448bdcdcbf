@@ -1,4 +1,4 @@
-blob 278
+blob 298
 #ifndef TREE_H
 #define TREE_H
 
@@ -17,5 +17,7 @@ typedef struct {
     const char *hash;
     const char *name;
 } tree_entry;
+
+void tree_build();
 
 #endif

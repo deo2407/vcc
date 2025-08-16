@@ -1,4 +1,4 @@
-blob 541
+blob 564
 SRC_DIR := src
 BIN_DIR := bin
 BUILD_DIR := build
@@ -30,4 +30,5 @@ clean:
 run: $(TARGET)
 	./$(TARGET) init
 	./$(TARGET) add .
+	./$(TARGET) rm main.c
 

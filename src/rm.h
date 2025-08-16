@@ -1,0 +1,6 @@
+#ifndef RM_H
+#define RM_H
+
+void remove_files_from_index(const char *files[], int size);
+
+#endif

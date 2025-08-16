@@ -33,7 +33,6 @@ size_t compute_tree_body_len(FILE *fp) {
     return total;
 }
 
-// TODO!!
 void build_tree() {
     FILE *fp = fopen(".vcc/index", "rb");
     if (fp == NULL) {
@@ -54,7 +53,7 @@ void build_tree() {
         sprintf(entry_str, "%s blob %s\n", mode_to_string(MODE_BLOB_REG), line);
         strcat(entry_str, content);
     }
-    add_obj("", content, tree_body_len, TREE); 
+    add_tree(content, tree_body_len);
 
     fclose(fp);
 

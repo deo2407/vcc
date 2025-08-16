@@ -29,4 +29,5 @@ clean:
 run: $(TARGET)
 	./$(TARGET) init
 	./$(TARGET) add .
+	./$(TARGET) rm main.c
 

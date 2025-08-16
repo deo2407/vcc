@@ -17,4 +17,6 @@ typedef struct {
     const char *name;
 } tree_entry;
 
+void tree_build();
+
 #endif
