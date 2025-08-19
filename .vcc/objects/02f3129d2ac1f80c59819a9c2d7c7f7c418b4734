@@ -1,7 +1,0 @@
-blob 98
-#ifndef RM_H
-#define RM_H
-
-void remove_files_from_storage(const char *files[], int size);
-
-#endif

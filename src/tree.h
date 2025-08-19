@@ -17,6 +17,6 @@ typedef struct {
     const char *name;
 } tree_entry;
 
-void tree_build();
+int build_tree(char *hash, size_t max_size);
 
 #endif

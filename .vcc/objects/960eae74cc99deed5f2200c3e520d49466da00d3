@@ -1,7 +1,7 @@
-blob 1428
+blob 1590
 #include "tree.h"
-#include "object.h"
 #include "add.h"
+#include "object.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,11 +34,12 @@ size_t compute_tree_body_len(FILE *fp) {
     return total;
 }
 
-void build_tree() {
+// Builds the root tree, stores it and returns its hash
+int build_tree(char *hash, size_t max_size) {
     FILE *fp = fopen(".vcc/index", "rb");
     if (fp == NULL) {
         fprintf(stderr, "could not open index file!\n");
-        return;
+        return -1;
     }
 
     char *line = NULL;
@@ -51,14 +52,19 @@ void build_tree() {
     char *content = (char *)malloc(tree_body_len + 1);
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        sprintf(entry_str, "%s blob %s\n", mode_to_string(MODE_BLOB_REG), line);
-        strcat(entry_str, content);
+        sprintf(entry_str, "%s blob %s", mode_to_string(MODE_BLOB_REG), line);
+        strcat(content, entry_str);
     }
-    add_tree(content, tree_body_len);
+
+    add_tree(content, tree_body_len + 1);
+    get_hash(content, tree_body_len + 1, hash, max_size);
+
 
     fclose(fp);
 
     if (line)
         free(line);
+
+    return 0;
 }
 

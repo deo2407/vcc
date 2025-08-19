@@ -1,4 +1,4 @@
-blob 1185
+blob 1356
 #include "init.h"
 
 #include <stdio.h>
@@ -24,6 +24,11 @@ int init_repo() {
 
         if (mkdir(".vcc/refs", 0700) == -1) {
             fprintf(stderr, "Error creating .vcc/refs: %s\n", strerror(errno));
+            return 1;
+        }
+
+        if (mkdir(".vcc/refs/heads", 0700) == -1) {
+            fprintf(stderr, "Error creating .vcc/refs/heads: %s\n", strerror(errno));
             return 1;
         }
 

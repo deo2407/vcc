@@ -26,6 +26,11 @@ int init_repo() {
             return 1;
         }
 
+        if (mkdir(".vcc/refs/heads", 0700) == -1) {
+            fprintf(stderr, "Error creating .vcc/refs/heads: %s\n", strerror(errno));
+            return 1;
+        }
+
         FILE *fp = fopen(".vcc/HEAD", "w");
         if (fp == NULL) {
             fprintf(stderr, "Unable to create file HEAD\n");

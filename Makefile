@@ -29,5 +29,4 @@ clean:
 run: $(TARGET)
 	./$(TARGET) init
 	./$(TARGET) add .
-	./$(TARGET) rm main.c
-
+	./$(TARGET) commit -m "Initial commit"

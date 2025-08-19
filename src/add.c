@@ -19,7 +19,7 @@ void add_to_index(const char *filename, const char *hash) {
     fclose(fp);
 }
 
-void add_tree(char *contents, long size) {
+int add_tree(char *contents, long size) {
     // serialize tree
     char *serialized = serialize_obj(contents, size, TREE);
 
@@ -30,12 +30,15 @@ void add_tree(char *contents, long size) {
     FILE *fp = fopen(hash_filename, "wb");
     if (fp == NULL) {
         fprintf(stderr, "could not create object file %s\n", hash_filename);
-        return;
+        return -1;
     }
     fprintf(fp, "%s", serialized);
+    printf("tree %s added to storage\n", hash_filename);
 
     free(serialized);
     fclose(fp);
+
+    return 0;
 }
 
 void add_file(const char *filename) {
@@ -117,7 +120,7 @@ void add_all() {
     rec_search("."); 
 }
 
-void add(const char *files[], size_t files_len) {
+void add(char *files[], int files_len) {
     if (strcmp(files[0], ".") == 0) {
         add_all();
     }

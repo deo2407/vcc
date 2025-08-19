@@ -1,6 +1,8 @@
+blob 92
 #ifndef RM_H
 #define RM_H
 
 void remove_files_from_storage(char *files[], int size);
 
 #endif
+X
